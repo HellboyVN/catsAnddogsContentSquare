@@ -23,8 +23,7 @@ import java.util.TreeSet;
 public class CsAnalytics {
 
     private Context context;
-    //petMap stores the position of each dog or cat
-    private HashMap<String, SortedSet<Integer>> petMap;
+    private HashMap<String, SortedSet<Integer>> petMap;//petMap stores the position of each dog or cat like <dog> [1, 3, 4, 5, 6] and <cat> [0, 2, 7]
     static String CAT = "cat";
     static String DOG = "dog";
     static String TAG = CsAnalytics.class.getName();
@@ -35,6 +34,7 @@ public class CsAnalytics {
     public CsAnalytics(@NonNull Context context) {
         this.context = context;
         petMap = new HashMap<>();
+        //using SortedSet to make sure no duplicate value
         SortedSet<Integer> cats = new TreeSet<>();
         SortedSet<Integer> dogs = new TreeSet<>();
         petMap.put(CAT, cats);
@@ -47,8 +47,8 @@ public class CsAnalytics {
     }
 
     public void trigger(@NonNull RecyclerView.ViewHolder holder, int position) {
-        //Displays the pop-up (Toast) with the dog or cat count.
         //Don't forget the thread and debounce timer.
+        //find which pet correspond to current position and count how many pet
         int catAmount = getIndex(petMap.get(CAT), position) + 1;
         int dogAmount = getIndex(petMap.get(DOG), position) + 1;
         String result = "";
@@ -60,9 +60,12 @@ public class CsAnalytics {
         }
 
         if (debouncedOnClickListener.onClickShowLog()) {
+            //Displays the pop-up (Toast) with the dog or cat count and uses the debounce function of 2s.
             Toast.makeText(context, result, Toast.LENGTH_SHORT).show();
             Log.d(TAG, result);
+            //write log to file
             boolean writeFile = writeStringAsFile(context, result, fileName);
+            // read file and notify
             if (writeFile) {
                 String textToSend = readFileAsString(context, fileName);
                 Intent intent = new Intent(FileUpdateReceiver.ACTION);
