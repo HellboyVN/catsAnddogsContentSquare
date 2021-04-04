@@ -1,6 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        catAndDogRelease {
+            storeFile file('/home/levan/Documents/AndroidProject/CatsandDogs/app/signingKeys/release.jks')
+            storePassword '123456'
+            keyAlias 'CatAndDog'
+            keyPassword '123456'
+        }
+    }
     compileSdkVersion 29
     defaultConfig {
         applicationId "com.example.catsanddogs"
@@ -12,8 +20,28 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            // Strip debug information
+            debuggable false
+            applicationIdSuffix '.release'
+            versionNameSuffix '-release'
+            signingConfig signingConfigs.catAndDogRelease
+        }
+        debug {
+            applicationIdSuffix ".debug"
+            debuggable true
+            versionNameSuffix '-debug'
+        }
+    }
+    // Specifies one flavor dimension.
+    flavorDimensions "levanTechnicalTest"
+    productFlavors {
+        //for release
+        catsAndDogs {
+            dimension "levanTechnicalTest"
+            applicationIdSuffix ".fullrelease"
+            versionNameSuffix "-fullrelease"
         }
     }
 }
@@ -23,6 +51,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'com.google.android.material:material:1.0.0'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -22,7 +23,10 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mActivityViewModel = new Model(this);
+        // mActivityViewModel = new Model(this);
+        // Update the model to allow data to survive configuration changes such as screen rotations using ViewModel and ViewModelProvider
+        // Another method is to add  android:configChanges="orientation|screenSize|screenLayout|keyboardHidden" to AndroidManifest.xml
+        mActivityViewModel =  new ViewModelProvider(this, new Model.MyViewModelFactory(this)).get(Model.class);
         mRecyclerView = findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(getGridLayoutManager());
         mRecyclerView.setAdapter(getAdapter());
