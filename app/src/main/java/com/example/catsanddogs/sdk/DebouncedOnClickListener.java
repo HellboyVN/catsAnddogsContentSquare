@@ -1,16 +1,7 @@
 package com.example.catsanddogs.sdk;
 
-import android.content.Context;
 import android.os.SystemClock;
 import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-
-import java.util.Map;
-import java.util.WeakHashMap;
 
 /**
  * A Debounced OnClickListener
@@ -21,12 +12,13 @@ public class DebouncedOnClickListener {
 
     private final long minimumInterval;
     private Long lastClickMap;
-    static String TAG = DebouncedOnClickListener.class.getName();
+    private final static String TAG = DebouncedOnClickListener.class.getName();
 
 
     /**
      * The one and only constructor
      * @param minimumIntervalMsec The minimum allowed time between clicks - any click sooner than this after a previous click will be rejected
+     * This class is simple debounce implementation without Runable
      */
     public DebouncedOnClickListener(long minimumIntervalMsec) {
         this.minimumInterval = minimumIntervalMsec;
@@ -36,6 +28,7 @@ public class DebouncedOnClickListener {
     public boolean onClickShowLog() {
         long currentTimestamp = SystemClock.uptimeMillis();
 
+        // check if we have never made a request or made a request long time ago or recently
         if(lastClickMap == 0L || (currentTimestamp - lastClickMap > minimumInterval)) {
             lastClickMap = currentTimestamp;
             return true;
@@ -44,4 +37,5 @@ public class DebouncedOnClickListener {
             return false;
         }
     }
+
 }

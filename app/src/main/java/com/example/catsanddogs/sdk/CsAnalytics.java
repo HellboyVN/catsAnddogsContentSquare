@@ -23,43 +23,57 @@ import java.util.TreeSet;
 public class CsAnalytics {
 
     private Context context;
-    private HashMap<String, SortedSet<Integer>> petMap;//petMap stores the position of each dog or cat like <dog> [1, 3, 4, 5, 6] and <cat> [0, 2, 7]
-    static String CAT = "cat";
-    static String DOG = "dog";
-    static String TAG = CsAnalytics.class.getName();
-    static final String fileName = "cat_and_dog.txt";
-    DebouncedOnClickListener debouncedOnClickListener;
-    FileUpdateReceiver fileUpdateReceiver;
+    //pet tracker stores the position of each dog or cat like <dog> [1, 3, 4, 5, 6] and <cat> [0, 2, 7]
+    private HashMap<String, SortedSet<Integer>> petMap;
+    private static String CAT = "cat";
+    private static String DOG = "dog";
+    private final static String TAG = CsAnalytics.class.getName();
+    private static final String fileName = "cat_and_dog.txt";
+
+    private FileUpdateReceiver fileUpdateReceiver;
+
+    private final Runnable debouncedExec;
+    private boolean isWaiting = false;
+    private static final long DELAY_MILLIS = 2000L;
 
     public CsAnalytics(@NonNull Context context) {
         this.context = context;
         petMap = new HashMap<>();
-        //using SortedSet to make sure no duplicate value
+        //Initial our pet tracker using SortedSet to make sure no duplicate value
         SortedSet<Integer> cats = new TreeSet<>();
         SortedSet<Integer> dogs = new TreeSet<>();
         petMap.put(CAT, cats);
         petMap.put(DOG, dogs);
-        debouncedOnClickListener = new DebouncedOnClickListener(2000);
-        //register receiver here but where to unregister
+        //initial BroadcastReceiver to get notice when file is updated
         fileUpdateReceiver = new FileUpdateReceiver();
-        IntentFilter filter = new IntentFilter(FileUpdateReceiver.ACTION);
-        context.registerReceiver(fileUpdateReceiver, filter);
+        //our debounce
+        this.debouncedExec = new DebouncedRunnable(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        //We can print log and access to file while isWaiting = true, otherwise it is forbidden.
+                        isWaiting = true;
+                    }
+                },
+                "CATS_AND_DOGS",
+                DELAY_MILLIS
+        );
     }
 
     public void trigger(@NonNull RecyclerView.ViewHolder holder, int position) {
-        //Don't forget the thread and debounce timer.
-        //find which pet correspond to current position and count how many pet
-        int catAmount = getIndex(petMap.get(CAT), position) + 1;
-        int dogAmount = getIndex(petMap.get(DOG), position) + 1;
+        //find which pet correspond to current position and count how many pet that we have
         String result = "";
-
-        if (catAmount > 0 && dogAmount == 0) {
+        if (holder.itemView.getContentDescription().equals(CAT)) {
+            int catAmount = getIndex(petMap.get(CAT), position) + 1;
             result = "Position " + position + ". There are " + catAmount + " cats.";
-        } else if (catAmount == 0 && dogAmount > 0){
+        } else {
+            int dogAmount = getIndex(petMap.get(DOG), position) + 1;
             result = "Position " + position + ". There are " + dogAmount + " dogs.";
         }
 
-        if (debouncedOnClickListener.onClickShowLog()) {
+        debouncedExec.run();
+
+        if (isWaiting) {
             //Displays the pop-up (Toast) with the dog or cat count and uses the debounce function of 2s.
             Toast.makeText(context, result, Toast.LENGTH_SHORT).show();
             Log.d(TAG, result);
@@ -67,18 +81,21 @@ public class CsAnalytics {
             boolean writeFile = writeStringAsFile(context, result, fileName);
             // read file and notify
             if (writeFile) {
-                String textToSend = readFileAsString(context, fileName);
+                //register receiver, should move to MainActivity
+                IntentFilter filter = new IntentFilter(FileUpdateReceiver.ACTION);
+                context.registerReceiver(fileUpdateReceiver, filter);
                 Intent intent = new Intent(FileUpdateReceiver.ACTION);
-                intent.putExtra(FileUpdateReceiver.ACTION_MESSAGE, textToSend);
+                intent.putExtra(FileUpdateReceiver.ACTION_MESSAGE, fileName);
+                //notify the receiver that file is updated
                 context.sendBroadcast(intent);
             }
-
+            isWaiting = false;
         }
 
     }
 
     public void track(@NonNull RecyclerView.ViewHolder holder, int position) {
-        //Registers all the pets from each grid.
+        //Registers all the pets from each grid to the pet tracker.
         if (holder.itemView.getContentDescription().equals(CAT)) {
             petMap.get(CAT).add(position);
         } else {
@@ -88,13 +105,18 @@ public class CsAnalytics {
 
     public void clear() {
         //Clears the log file.
+        File file = new File(context.getFilesDir(), fileName);
+        if(file.exists())
+            file.delete();
     }
 
     public int getIndex(SortedSet<Integer> set, int value) {
         int result = 0;
-        for (int entry:set) {
-            if (entry == value) return result;
-            result++;
+        if (set != null && !set.isEmpty()) {
+            for (int entry:set) {
+                if (entry == value) return result;
+                result++;
+            }
         }
         return -1;
     }
@@ -106,28 +128,10 @@ public class CsAnalytics {
             out.write(fileContents);
             out.close();
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(TAG, "Error: Can not write to file.");
             return false;
         }
         return true;
-    }
-
-    public static String readFileAsString(Context context, String fileName) {
-        StringBuilder stringBuilder = new StringBuilder();
-        String line;
-        BufferedReader in;
-
-        try {
-            in = new BufferedReader(new FileReader(new File(context.getFilesDir(), fileName)));
-            while ((line = in.readLine()) != null) stringBuilder.append(line);
-
-        } catch (FileNotFoundException e) {
-            Log.e(TAG, e.getMessage());
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
-        }
-
-        return stringBuilder.toString();
     }
 
 }
