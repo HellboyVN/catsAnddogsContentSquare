@@ -2,16 +2,17 @@ package com.example.catsanddogs.sdk;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -26,8 +27,6 @@ public class CsAnalytics {
     private final static String TAG = CsAnalytics.class.getName();
     private static final String fileName = "cat_and_dog.txt";
 
-    private FileUpdateReceiver fileUpdateReceiver;
-
     private final Runnable debouncedExec;
     private boolean isWaiting = false;
     private static final long DELAY_MILLIS = 2000L;
@@ -40,8 +39,7 @@ public class CsAnalytics {
         SortedSet<Integer> dogs = new TreeSet<>();
         petMap.put(CAT, cats);
         petMap.put(DOG, dogs);
-        //initial BroadcastReceiver to get notice when file is updated
-        fileUpdateReceiver = new FileUpdateReceiver();
+
         //our debounce
         this.debouncedExec = new DebouncedRunnable(
                 new Runnable() {
@@ -77,12 +75,9 @@ public class CsAnalytics {
             boolean writeFile = writeStringAsFile(context, result, fileName);
             // read file and notify
             if (writeFile) {
-                //register receiver, should move to MainActivity
-                IntentFilter filter = new IntentFilter(FileUpdateReceiver.ACTION);
-                context.registerReceiver(fileUpdateReceiver, filter);
+                //notify the receiver that file is updated and send the file name to the receiver in order to read file
                 Intent intent = new Intent(FileUpdateReceiver.ACTION);
                 intent.putExtra(FileUpdateReceiver.ACTION_MESSAGE, fileName);
-                //notify the receiver that file is updated
                 context.sendBroadcast(intent);
             }
             isWaiting = false;
@@ -107,6 +102,7 @@ public class CsAnalytics {
     }
 
     public int getIndex(SortedSet<Integer> set, int value) {
+        // return the index of position on the set
         int result = 0;
         if (set != null && !set.isEmpty()) {
             for (int entry:set) {
@@ -117,11 +113,15 @@ public class CsAnalytics {
         return -1;
     }
 
-    public boolean writeStringAsFile(Context context, final String fileContents, String fileName) {
+    public synchronized boolean writeStringAsFile(Context context, final String fileContents, String fileName) {
 
         try {
-            FileWriter out = new FileWriter(new File(context.getFilesDir(), fileName));
-            out.write(fileContents);
+            /*
+             * Using a BufferedWriter is recommended for an expensive writer (such as FileWriter).
+             * Using a PrintWriter gives access to println syntax.
+             */
+            PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(context.getFilesDir(), fileName), true)));
+            out.println(fileContents);
             out.close();
         } catch (IOException e) {
             Log.e(TAG, "Error: Can not write to file.");

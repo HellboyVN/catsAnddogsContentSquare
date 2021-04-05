@@ -14,19 +14,22 @@ public class Model extends ViewModel {
     static String DOG = "dog";
     private String[] mPetList;
     private Context mContext;
+    private MyAdapter myAdapter;
 
     public Model(Context context){
         mContext = context;
     }
 
     public MyAdapter populateAdapterData() {
-        //Modify populateAdapterData() to retrieve available data from configuration changes
-        //If mPetList is available then reuse it, otherwise create a new one
-        if (mPetList != null && mPetList[0] != null) {
-            return new MyAdapter(mContext, mPetList);
-        } else {
-            return new MyAdapter(mContext, createPetList());
+        /*
+         * Modify populateAdapterData() to retrieve available data from configuration changes
+         * Make sure data to survive configuration changes such as screen rotations.
+         * If myAdapter is available then reuse it, otherwise create a new one
+         */
+        if (myAdapter == null) {
+            myAdapter = new MyAdapter(mContext, createPetList());
         }
+        return myAdapter;
     }
 
     public String[] createPetList() {
