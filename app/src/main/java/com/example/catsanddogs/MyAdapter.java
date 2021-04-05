@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import com.example.catsanddogs.sdk.CsAnalytics;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.PetViewHolder> {
@@ -53,6 +54,16 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.PetViewHolder> {
     @Override
     public int getItemCount() {
         return mPetList.length;
+    }
+
+    @VisibleForTesting
+    public String[] getmPetList() {
+        return mPetList;
+    }
+
+    @VisibleForTesting
+    public CsAnalytics getCsAnalytics() {
+        return mCsAnalytics;
     }
 
     class PetViewHolder extends RecyclerView.ViewHolder {

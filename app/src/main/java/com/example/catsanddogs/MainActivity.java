@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @VisibleForTesting
-    MyAdapter getAdapter(){
+    public MyAdapter getAdapter(){
         return mActivityViewModel.populateAdapterData();
     }
 

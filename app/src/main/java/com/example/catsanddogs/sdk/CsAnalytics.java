@@ -6,6 +6,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.BufferedWriter;
@@ -128,6 +129,11 @@ public class CsAnalytics {
             return false;
         }
         return true;
+    }
+
+    @VisibleForTesting
+    public HashMap<String, SortedSet<Integer>> getPetMap() {
+        return petMap;
     }
 
 }
