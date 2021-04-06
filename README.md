@@ -14,9 +14,9 @@ git clone git@github.com:HellboyVN/catsAnddogsContentSquare.git
 
 1. Each time the user taps on the screen, we should count the number of cats or dogs already scrolled by the user.
 >* Using only the two methods from the CsAnalytics​ ​ class to achieve this objective. No need to call any other class outside of the SDK package.
->>* *public void track(@NonNull RecyclerView.ViewHolder holder, int position {}* : Save the pet at the current position to the pet tracker. The pet tracker will store the pet positions like:
->>>* <dog> <0, 1, 4, 5, 6, 7, 9 ,10>
->>>* <cat> <2, 3, 8>
+>>* public void track(@NonNull RecyclerView.ViewHolder holder, int position {}* : Save the pet at the current position to the pet tracker. The pet tracker will store the pet positions like:
+>>>* **[dog]** <0, 1, 4, 5, 6, 7, 9 ,10>
+>>>* **[cat]** <2, 3, 8>
 >>* *public void trigger(@NonNull RecyclerView.ViewHolder holder, int position) {}*: calculate how many pets are the same with the pet at current position base on the index of current position in the pet tracker, then display the result in logcats and android Toast.
 
 >* Log the result to the Logcat.
