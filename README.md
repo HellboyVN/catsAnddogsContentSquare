@@ -58,5 +58,9 @@ Launch the app on real android device and execute three tests.
 >* Open application, scroll to specific position and press the item, make sure the app features working as expected.
 >* Compare the pet tracker values of CsAnalytics and the values on the initial list of pets.
 
+3. Right now the test is running on debug build type. To run the test:
+>* For local unit test: ```./gradlew test```
+>* For instrumented test: ```./gradlew connectedAndroidTest``` (make sure your device is connected)
+
         
 
