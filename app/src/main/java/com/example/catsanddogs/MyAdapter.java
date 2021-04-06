@@ -42,6 +42,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.PetViewHolder> {
             holder.mPet.setImageResource(R.drawable.dog);
             holder.mPet.setContentDescription(Model.DOG);
         }
+
         mCsAnalytics.track(holder, position);
         holder.mPet.setOnClickListener(new View.OnClickListener() {
             @Override

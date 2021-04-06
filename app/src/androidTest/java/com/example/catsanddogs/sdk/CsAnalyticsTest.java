@@ -49,8 +49,7 @@ public class CsAnalyticsTest {
     private static final String fileName = "cat_and_dog.txt";
 
     @Rule
-    public ActivityTestRule<MainActivity> activityTestRule =
-            new ActivityTestRule<>(MainActivity.class);
+    public ActivityTestRule<MainActivity> activityTestRule = new ActivityTestRule<>(MainActivity.class);
 
     @Before
     public void before() {
@@ -113,7 +112,7 @@ public class CsAnalyticsTest {
     public void comparePetTrackerTest() {
         /*
          * Get the pet tracker on CsAnalytics and compare each position of the pet tracker with
-         * corresponding position on the list of pets of MainActivity.
+         * corresponding position on the list of pets in MainActivity.
          */
         HashMap<String, SortedSet<Integer>> petMap;
         String[] mPetList = activity.getAdapter().getmPetList();
