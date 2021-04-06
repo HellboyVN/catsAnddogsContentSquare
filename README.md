@@ -21,8 +21,7 @@ git clone git@github.com:HellboyVN/catsAnddogsContentSquare.git
 
 >* Log the result to the Logcat.
 
-2. Implement a debounce ​ without​ using library
-a. Implement a debounce of 2 seconds before printing the result to the logcat.
+2. Implement a debounce ​ without​ using library. Implement a debounce of 2 seconds before printing the result to the logcat.
 >* I have implemented 2 debounce classes, one using thread runable, one is not. And I choose to use the DebounceRunable class.
 >* Example​ : If the user performs 4 taps in a second, only the last tap should be printed to the Logcat.
 3. Write the result to a file, in addition of the Logcat
