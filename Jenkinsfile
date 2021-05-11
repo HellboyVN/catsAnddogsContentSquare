@@ -8,7 +8,6 @@ pipeline {
     stages {
         stage("Build") {
             steps {
-                sh "gralde -v"
 				sh "./gradlew clean"
                 sh "./gradlew build"
             }
