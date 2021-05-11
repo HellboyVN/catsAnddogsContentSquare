@@ -12,7 +12,7 @@ pipeline {
 				echo "export PATH=$PATH:$ANDROID_HOME/tools"
 				sh "gradle -v"
 				sh "./gradlew clean"
-                sh "./gradlew build"
+                sh "./gradlew test"
             }
         }
     }
