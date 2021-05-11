@@ -10,6 +10,7 @@ pipeline {
             steps {
 				echo "export ANDROID_HOME=/home/levan/Android/Sdk"
 				echo "export PATH=$PATH:$ANDROID_HOME/tools"
+				sh "gradle -v"
 				sh "./gradlew clean"
                 sh "./gradlew build"
             }
