@@ -8,6 +8,8 @@ pipeline {
     stages {
         stage("Build") {
             steps {
+				echo "export ANDROID_HOME=/home/levan/Android/Sdk"
+				echo "export PATH=$PATH:$ANDROID_HOME/tools"
 				sh "./gradlew clean"
                 sh "./gradlew build"
             }
